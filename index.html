@@ -1,0 +1,23 @@
+<head>
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+</head>
+
+<body>
+  <svg><path class='path'></svg>
+
+  <script>
+    var mydata = [[1, 1], [50, 50], [100, 1], [200, 100]]
+
+    var line = d3.svg.line()
+      .interpolate("basis");
+    
+    function draw(data) {
+      var path = d3.select('svg').selectAll('path.path').data([data])
+        .attr("d", function(d) { return line(d); })
+        .style("stroke", "steelblue")
+        .style("fill", "none");
+    }
+
+    draw(mydata);
+  </script>
+</body>
