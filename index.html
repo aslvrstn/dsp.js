@@ -33,12 +33,14 @@
         .append('path')
           .attr('class', 'signal');
 
-    var mydata = [[1, 1], [50, 50], [100, 1], [200, 100]]
+    var mydata = [[0, .2], [1, 1], [2, 0], [3, .5], [4, .75]]
 
-    var line = d3.svg.line()
-      .interpolate('basis');
-    
     function draw(data) {
+      var line = d3.svg.line()
+        .x(function(d) { return xScale(d[0]); })
+        .y(function(d) { return yScale(d[1]); })
+        .interpolate('basis');
+
       var xScale = d3.scale.linear()
         .domain([0, d3.max(data, function(d) {return d[0];})])
         .range([padding, width - padding * 2]);
