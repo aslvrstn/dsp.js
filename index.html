@@ -1,5 +1,6 @@
 <head>
   <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
 
   <style type="text/css">
     .axis path,
@@ -21,7 +22,7 @@
     .graph {
     }
 
-    .inputbox {
+    .datainput {
       position: absolute;
       top: 45px;
       left: 65px;
@@ -32,7 +33,7 @@
 <body>
 
   <div class='graph'>
-    <input class='inputbox'/>
+    <input class='datainput'/>
     <svg><path class='signal'/></svg>
   </div>
 
@@ -46,7 +47,16 @@
         .style('width', width)
         .style('height', height);
 
-    var mydata = [[0, .2], [1, 1], [2, 0], [3, .5], [4, .75]]
+    $('.datainput').keyup(function() {draw(generateData($(this).val()))});
+
+    function generateData(str) {
+      return $.map(str.trim().split(/[\s,]+/), function(val, i) {
+          // jQuery.map auto-flattens, so wrap the tuple in another array.
+          return [[i, parseFloat(val)]];
+        });
+    }
+
+    var mydata = [[0, .2], [1, 1], [2, 0], [3, .5], [4, .75]];
 
     function draw(data) {
       var line = d3.svg.line()
@@ -81,6 +91,5 @@
         .attr('d', function(d) { return line(d); });
     }
 
-    draw(mydata);
   </script>
 </body>
