@@ -34,7 +34,11 @@
 
   <div class='graph'>
     <input class='datainput'/>
-    <svg><path class='signal'/></svg>
+    <svg>
+      <path class='signal'/>
+      <g class='axis xaxis'/>
+      <g class='axis yaxis'/>
+    </svg>
   </div>
 
   <script>
@@ -42,21 +46,23 @@
     var height = 300;
     var padding = 30;
 
-    d3.select('body')
-      .select('.graph')
-        .style('width', width)
-        .style('height', height);
+   var graph = d3.select('body')
+                 .select('.graph')
+                   .style('width', width)
+                   .style('height', height);
 
     $('.datainput').keyup(function() {draw(generateData($(this).val()))});
 
     function generateData(str) {
-      return $.map(str.trim().split(/[\s,]+/), function(val, i) {
-          // jQuery.map auto-flattens, so wrap the tuple in another array.
-          return [[i, parseFloat(val)]];
-        });
+      var floats = $.map(str.split(/[\s,]+/), function(val) {
+        var parseVal = parseFloat(val);
+        return isNaN(parseVal) ? null : parseVal;
+      });
+      return $.map(floats, function(val, i) {
+        // jQuery.map auto-flattens, so wrap the tuple in another array.
+        return [[i, val]];
+      });
     }
-
-    var mydata = [[0, .2], [1, 1], [2, 0], [3, .5], [4, .75]];
 
     function draw(data) {
       var line = d3.svg.line()
@@ -64,11 +70,14 @@
         .y(function(d) { return yScale(d[1]); })
         .interpolate('basis');
 
+      function getX(d) {return d[0];};
+      function getY(d) {return d[1];};
+
       var xScale = d3.scale.linear()
-        .domain([0, d3.max(data, function(d) {return d[0];})])
+        .domain([0, d3.max(data, getX)])
         .range([padding, width - padding * 2]);
       var yScale = d3.scale.linear()
-        .domain([0, d3.max(data, function(d) {return d[1];})])
+        .domain([d3.min(data, getY), d3.max(data, getY)])
         .range([height - padding, padding]);
       var xAxis = d3.svg.axis()
         .scale(xScale)
@@ -78,12 +87,10 @@
         .scale(yScale)
         .orient('left')
         .ticks(5);
-      var grid = d3.select('svg').append('g')
-        .attr('class', 'axis')
+      var grid = d3.select('g.xaxis')
         .attr('transform', "translate(0," + (height - padding) + ")")
         .call(xAxis);
-      var grid = d3.select('svg').append('g')
-        .attr('class', 'axis')
+      var grid = d3.select('g.yaxis')
         .attr('transform', "translate(" + padding + ",0)")
         .call(yAxis);
 
